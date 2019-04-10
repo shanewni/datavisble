@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts-en.common.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    <title>Title</title>
+    <style>
+        #title1 {
+            position: absolute;
+            left: 20%;
+            font-size: 16px;
+            color: #ff720f;
+            z-index: 9999999;
+        }
+        #title2 {
+            position: absolute;
+            left: 40%;
+            top: 45px;
+            font-size: 16px;
+            color: #ffc539;
+            z-index: 9999999;
+        }
+        #title3 {
+            position: absolute;
+            left: 30%;
+            top: 27.5px;
+            font-size: 16px;
+            color: #ffa210;
+            z-index: 9999999;
+        }
+    </style>
+</head>
+<body>
+<div id="title1">榜首：<span id="works1">亵渎</span></div>
+<div id="title2">次榜：<span id="works2">梦回九七</span></div>
+<div id="title3">榜眼：<span id="works3">重生传说</span></div>
+<div id="main" style="width: 100vw;height:100vh;"></div>
+
+<script>
+    var author = []
+    var count = []
+    var timestamp = ""
+    var x = 0
+    for (y = 2005; y <= 2019; y++) {
+        for (m = 1; m <= 12; m++) {
+            if (y == 2005 && m == 1) {
+                continue
+            }
+            if (y == 2019 && m > 4) {
+                break
+            }
+            (function (y, m) {
+                setTimeout(function () {
+                    $.get("http://127.0.0.1:3333/?year=" + y.toString() + "&mouth=" + m.toString(), function (data, status) {
+                        var obj = JSON.parse(data)
+                        for (i = 0; i < obj.length; i++) {
+                            author[i] = obj[i].author
+                            count[i] = obj[i].count
+                            if (i == 10) {
+                                break
+                            }
+                        }
+
+                        console.log(obj[0])
+                        var newDate = new Date()
+                        newDate.setTime(obj[0].stamp * 1000)
+                        $("#works1").html(obj[0].name+"/"+obj[0].count);
+                        $("#works2").html(obj[1].name+"/"+obj[1].count);
+                        $("#works3").html(obj[2].name+"/"+obj[2].count);
+                        timestamp = newDate.format('yyyy年MM月')
+                    })
+                }, x * 2000)
+            })(y, m);
+            x++
+
+        }
+    }
+
+
+    Date.prototype.format = function (format) {
+        var date = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in date) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+            }
+        }
+        return format;
+    }
+
+
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: "2005年02月",
+            subtext: '小说作者影响力',
+
+        },
+        legend: {
+            animationDurationUpdate: function (idx) {
+                // 越往后的数据延迟越大
+                return idx * 100;
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            boundaryGap: [0, 0.01]
+        },
+        yAxis: {
+            type: 'category',
+            data: ["烟雨江南", "通灵者", "周行文", "血红", "赤虎", "瑞根", "骷髅精灵", "傲无常", "大秦炳炳", "charlesp", "又是十三"],
+            inverse: true
+        },
+        series: [
+            {
+                type: 'bar',
+                itemStyle: {
+                    normal: {
+                        color: function (params) {
+                            //首先定义一个数组
+                            var colorList = [
+                                '#e8e3c0', '#ef0064', '#64BD3D', '#EE9201', '#29AAE3',
+                                '#B74AE5', '#0AAF9F', '#E89589', '#1dacaf', '#c37508',
+                                '#94afaa', '#e7cfe8', '#90af9b',
+                            ];
+                            return colorList[params.dataIndex]
+                        },
+                        //以下为是否显示
+                        label: {
+                            show: false
+                        }
+                    }
+                },
+                data: [1386, 1139, 938, 594, 403, 329, 256, 103, 94, 85, 82],
+            },
+        ]
+    };
+
+    myChart.setOption(option);
+
+    setInterval(function () {
+        myChart.setOption({
+            title: {
+                text: timestamp,
+            },
+            yAxis: {
+                data: author
+            },
+            series: [{
+                data: count
+            }]
+        });
+    }, 1000);
+
+</script>
+</body>
+</html>
