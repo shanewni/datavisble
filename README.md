@@ -12,7 +12,7 @@
 
 ### 1、主要结构
 
-   ####proxypool：
+proxypool：
     
    - 在运行程序之前需要下载[phantomjs](http://phantomjs.org/)
 　　
@@ -37,7 +37,7 @@ PASSWD   = 56781234 //访问数据库的密码
 - 如果编译报错，请查看[proxypool开源网址](https://github.com/henson/ProxyPool)
 
 
- ####reptile：
+reptile：
 
 - 爬虫实现，使用框架goquery
 - 数据库mysql
@@ -45,7 +45,7 @@ PASSWD   = 56781234 //访问数据库的密码
 - 破解反爬字体使用工具[fonttools](https://github.com/fonttools/fonttools)
 
 
- ####web：
+web：
 - 实现简单的web服务端
 - 提供接口输出json数据
 - 简单的前端代码
