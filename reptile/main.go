@@ -6,6 +6,8 @@ import (
 	"distributed/reptile/engine"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-clog/clog"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,6 +15,8 @@ import (
 )
 
 func main() {
+	//创建日志
+	Clog()
 	//存放字体破解文件数据
 	//月票数被加密，使用破解文件进行破解
 	fontCrack := make(map[string]map[string]string)
@@ -30,7 +34,8 @@ func main() {
 			//获取当前根目录的子页数量
 			end, errEnd := re.Start()
 			if errEnd != nil {
-				fmt.Println(errEnd)
+				clog.Fatal(2, "Fail to get end : %v\n", errEnd)
+				//fmt.Println(errEnd)
 			}
 			if end == 0 {
 				continue
@@ -38,7 +43,8 @@ func main() {
 			//将当前年月的所有页面数据进行解析
 			authors = append(authors, JudjeView(end, y, m, url)...)
 			if debugs.Debugs {
-				fmt.Println(engine.FontHead+authors[0].GetFontUrl()+engine.FontTail, authors)
+				clog.Trace("%s %v", engine.FontHead+authors[0].GetFontUrl()+engine.FontTail, authors)
+				//fmt.Println(engine.FontHead+authors[0].GetFontUrl()+engine.FontTail, authors)
 			}
 		}
 		//解析真实月票数并添加到数据中
@@ -46,9 +52,21 @@ func main() {
 		//插入到mysql中
 		tt := time.Now()
 		db.InsertSql(authors)
-		fmt.Printf("插入%d年数据用时%s\n", y, time.Now().Sub(tt).String())
+		clog.Trace("插入%d年数据用时%s\n", y, time.Now().Sub(tt).String())
+		//fmt.Printf("插入%d年数据用时%s\n", y, time.Now().Sub(tt).String())
 	}
 
+}
+
+//创建日志
+func Clog() {
+	err := clog.New(clog.FILE, clog.FileConfig{
+		Filename: "reptile.log",
+	})
+	if err != nil {
+		fmt.Printf("Fail to create new logger: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 //根据html页面进行解析
@@ -60,7 +78,8 @@ func JudjeView(end, y, m int, url string) []engine.Author {
 	for page := 1; page <= end; page++ {
 		doc, errPage := goquery.NewDocument(url + fmt.Sprintf("%d", page))
 		if errPage != nil {
-			fmt.Println("goquery.NewDocument(url+page) error", errPage)
+			clog.Fatal(2, "Fail to goquery.NewDocument(url+page) error : %v\n", errPage)
+			//fmt.Println("goquery.NewDocument(url+page) error", errPage)
 		}
 		doc.Find(".rank-table-list").Find("tbody").Find("tr").Each(func(i int, selection *goquery.Selection) {
 			author := engine.Author{}
@@ -96,7 +115,8 @@ func JudjeView(end, y, m int, url string) []engine.Author {
 			author.AddTime(old.Unix())
 
 			if debugs.Debugs {
-				fmt.Println(author)
+				clog.Trace("%v", author)
+				//fmt.Println(author)
 			}
 
 			authors = append(authors, author)
@@ -104,7 +124,8 @@ func JudjeView(end, y, m int, url string) []engine.Author {
 		//防封
 		time.Sleep(time.Second * 2)
 	}
-	fmt.Printf("%d年%02d月数据以爬完,共%d页，用时%s,ip防封停顿%d秒\n", y, m, end, time.Now().Sub(tt).String(), end*2)
+	clog.Trace("%d年%02d月数据以爬完,共%d页，用时%s,ip防封停顿%d秒\n", y, m, end, time.Now().Sub(tt).String(), end*2)
+	//fmt.Printf("%d年%02d月数据以爬完,共%d页，用时%s,ip防封停顿%d秒\n", y, m, end, time.Now().Sub(tt).String(), end*2)
 	return authors
 }
 
@@ -140,7 +161,8 @@ func judjeTime(y, m int) bool {
 	old, _ := time.Parse("2006-01", fmt.Sprintf("%02d-%02d", y, m))
 	new, _ := time.Parse("2006-01", fmt.Sprintf("%02d-%02d", time.Now().Year(), time.Now().Month()))
 	if old.Unix() > new.Unix() {
-		fmt.Println("爬取数据结束")
+		clog.Trace("爬取数据结束")
+		//fmt.Println("爬取数据结束")
 		return true
 	} else {
 		return false

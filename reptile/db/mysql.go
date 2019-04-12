@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"distributed/reptile/engine"
 	"fmt"
+	"github.com/go-clog/clog"
 	_ "github.com/go-sql-driver/mysql"
 	"strings"
 )
@@ -13,7 +14,8 @@ func InsertSql(authors []engine.Author) {
 	db, err := sql.Open("mysql", "root:52172d++@tcp(127.0.0.1:3306)/?charset=utf8")
 	defer db.Close()
 	if err != nil {
-		fmt.Println("open sql error: ", err)
+		clog.Fatal(2, "open sql error:", err)
+		//fmt.Println("open sql error: ", err)
 	}
 	value := []string{}
 	for _, v := range authors {
@@ -25,7 +27,8 @@ func InsertSql(authors []engine.Author) {
 	_, errInsert := tx.Query(`INSERT ippool.author VALUE ` + v)
 	if errInsert != nil {
 		tx.Rollback()
-		fmt.Printf("INSERT author error: ", errInsert)
+		clog.Trace("INSERT author error: %s ",errInsert)
+		//fmt.Printf("INSERT author error: ", errInsert)
 	} else {
 		tx.Commit()
 	}

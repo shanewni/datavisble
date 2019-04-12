@@ -2,8 +2,8 @@ package engine
 
 import (
 	"distributed/reptile/debugs"
-	"fmt"
 	"github.com/donnie4w/dom4g"
+	"github.com/go-clog/clog"
 	"io"
 	"net/http"
 	"os"
@@ -145,11 +145,13 @@ func (a *Author) CreateFontFile() {
 	res, errGet := http.Get(FontHead + a.ttfFontStyle + FontTail)
 	defer res.Body.Close()
 	if errGet != nil {
-		fmt.Println("Get font error", errGet)
+		clog.Fatal(2, "Get font error", errGet)
+		//fmt.Println("Get font error", errGet)
 	}
 	f, errCreate := os.Create("./reptile/crack/" + a.ttfFontStyle + FontTail)
 	if errCreate != nil {
-		fmt.Println("Create error", errCreate)
+		clog.Fatal(2, "Create error", errCreate)
+		//fmt.Println("Create error", errCreate)
 		return
 	}
 	io.Copy(f, res.Body)
@@ -160,10 +162,12 @@ func (a *Author) BuildFontFile() {
 	cmd := exec.Command("ttx", "./reptile/crack/"+a.ttfFontStyle+FontTail)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println(err)
+		clog.Fatal(2, "error", err)
+		//fmt.Println(err)
 	}
 	if debugs.Debugs {
-		fmt.Println(string(out))
+		clog.Trace("%s ",string(out))
+		//fmt.Println(string(out))
 	}
 
 }
@@ -173,7 +177,8 @@ func (a *Author) CraCkXML() map[string]string {
 	table := make(map[string]string)
 	file, errCrackXml := os.Open("./reptile/crack/" + a.ttfFontStyle + ".ttx")
 	if errCrackXml != nil {
-		fmt.Println(errCrackXml)
+		clog.Fatal(2, "error", errCrackXml)
+		//fmt.Println(errCrackXml)
 	}
 	ele, _ := dom4g.LoadByStream(file)
 	eles := ele.Node("cmap").Node("cmap_format_12").Nodes("map")

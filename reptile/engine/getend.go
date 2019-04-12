@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-clog/clog"
 	"strconv"
 )
 
@@ -18,7 +19,8 @@ type ReturnEnd struct {
 func (r *ReturnEnd) Start() (int, error) {
 	docStart, errStart := goquery.NewDocument(r.Url)
 	if errStart != nil {
-		fmt.Println("open root error：", errStart)
+		clog.Fatal(2, "open root error:", errStart)
+		//fmt.Println("open root error：", errStart)
 	}
 	if end, ok := docStart.Find("#page-container").Attr("data-pagemax"); ok {
 		return strconv.Atoi(end)

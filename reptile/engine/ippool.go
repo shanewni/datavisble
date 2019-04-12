@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/go-clog/clog"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -19,7 +20,8 @@ func Ippool(curl string) (*goquery.Document, bool){
 	defer func() {
 		if err := recover();err !=nil{
 			if debugs.Debugs{
-				fmt.Println("null ip：",err)
+				clog.Trace("null ip：%s \n",err)
+				//fmt.Println("null ip：",err)
 			}
 			pass = false
 		}
@@ -31,7 +33,7 @@ func Ippool(curl string) (*goquery.Document, bool){
 		return doc,true
 	}
 	proxy, _ := url.Parse("http://"+ip)
-	fmt.Println(proxy)
+	//fmt.Println(proxy)
 	tr := &http.Transport{
 		Proxy:           http.ProxyURL(proxy),
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -45,10 +47,12 @@ func Ippool(curl string) (*goquery.Document, bool){
 	doc, err := goquery.NewDocumentFromResponse(res)
 	res.Body.Close()
 	if err != nil {
-		fmt.Println(err)
+		clog.Fatal(2, "error", err)
+		//fmt.Println(err)
 		return nil, false
 	}
 	if debugs.Debugs {
+		clog.Trace("%s %s \n",ip,curl)
 		fmt.Println(ip,curl)
 	}
 

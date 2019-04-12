@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/go-clog/clog"
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"time"
@@ -21,7 +22,8 @@ type author struct {
 func main() {
 	http.HandleFunc("/", a)
 	if err := http.ListenAndServe(":3333", nil); err != nil {
-		fmt.Println("ListenAndServe:", err)
+		clog.Fatal(2, "Fail to ListenAndServe : %v\n", err)
+		//fmt.Println("ListenAndServe:", err)
 	}
 }
 
