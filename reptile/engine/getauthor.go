@@ -146,12 +146,10 @@ func (a *Author) CreateFontFile() {
 	defer res.Body.Close()
 	if errGet != nil {
 		clog.Fatal(2, "Get font error", errGet)
-		//fmt.Println("Get font error", errGet)
 	}
 	f, errCreate := os.Create("./reptile/crack/" + a.ttfFontStyle + FontTail)
 	if errCreate != nil {
 		clog.Fatal(2, "Create error", errCreate)
-		//fmt.Println("Create error", errCreate)
 		return
 	}
 	io.Copy(f, res.Body)
@@ -163,11 +161,9 @@ func (a *Author) BuildFontFile() {
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		clog.Fatal(2, "error", err)
-		//fmt.Println(err)
 	}
 	if debugs.Debugs {
 		clog.Trace("%s ",string(out))
-		//fmt.Println(string(out))
 	}
 
 }
@@ -178,7 +174,6 @@ func (a *Author) CraCkXML() map[string]string {
 	file, errCrackXml := os.Open("./reptile/crack/" + a.ttfFontStyle + ".ttx")
 	if errCrackXml != nil {
 		clog.Fatal(2, "error", errCrackXml)
-		//fmt.Println(errCrackXml)
 	}
 	ele, _ := dom4g.LoadByStream(file)
 	eles := ele.Node("cmap").Node("cmap_format_12").Nodes("map")

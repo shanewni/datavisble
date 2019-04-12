@@ -20,7 +20,7 @@ type author struct {
 }
 
 func main() {
-	http.HandleFunc("/", a)
+	http.HandleFunc("/", authorJson)
 	if err := http.ListenAndServe(":3333", nil); err != nil {
 		clog.Fatal(2, "Fail to ListenAndServe : %v\n", err)
 		//fmt.Println("ListenAndServe:", err)
@@ -28,19 +28,19 @@ func main() {
 }
 
 //实现数据接口
-func a(w http.ResponseWriter, r *http.Request) {
+func authorJson(w http.ResponseWriter, r *http.Request) {
 	//允许跨域
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	//获取参数
 	r.ParseForm()
-	if len(r.Form["year"]) > 0 || len(r.Form["mouth"]) > 0{
-		db, _ := sql.Open("mysql", "root:52172d++@tcp(127.0.0.1:3306)/?charset=utf8")
+	if len(r.Form["year"]) > 0 || len(r.Form["mouth"]) > 0 {
+		db, _ := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/?charset=utf8")
 		defer db.Close()
 
 		authors := []author{}
 		times := "2006-01-02 15:04"
-		t, _ := time.Parse(times,fmt.Sprintf("%s-%s-%s %s",r.Form["year"][0],fmt.Sprintf("%02s",r.Form["mouth"][0]),"01","00:00"))
-		row, _ := db.Query("SELECT * FROM ippool.author WHERE time = "+fmt.Sprintf("%d",t.Unix()))
+		t, _ := time.Parse(times, fmt.Sprintf("%s-%s-%s %s", r.Form["year"][0], fmt.Sprintf("%02s", r.Form["mouth"][0]), "01", "00:00"))
+		row, _ := db.Query("SELECT * FROM ippool.author WHERE time = " + fmt.Sprintf("%d", t.Unix()))
 		for row.Next() {
 			a := author{}
 			row.Scan(&a.Uid, &a.Type, &a.Name, &a.Author, &a.Count, &a.Stamp)

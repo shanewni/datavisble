@@ -11,11 +11,10 @@ import (
 
 //插入数据
 func InsertSql(authors []engine.Author) {
-	db, err := sql.Open("mysql", "root:52172d++@tcp(127.0.0.1:3306)/?charset=utf8")
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/?charset=utf8")
 	defer db.Close()
 	if err != nil {
 		clog.Fatal(2, "open sql error:", err)
-		//fmt.Println("open sql error: ", err)
 	}
 	value := []string{}
 	for _, v := range authors {
@@ -28,7 +27,6 @@ func InsertSql(authors []engine.Author) {
 	if errInsert != nil {
 		tx.Rollback()
 		clog.Trace("INSERT author error: %s ",errInsert)
-		//fmt.Printf("INSERT author error: ", errInsert)
 	} else {
 		tx.Commit()
 	}
